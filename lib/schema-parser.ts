@@ -30,7 +30,7 @@ export type FormField = z.infer<typeof FormFieldSchema>;
 export const FormConfigSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  webhookUrl: z.string().url("Valid webhook URL is required"),
+  webhookUrl: z.string().url("Valid webhook URL is required").optional().or(z.literal('')),
   submitButtonText: z.string().default("Submit"),
   successMessage: z.string().default("Thank you. Your response has been submitted."),
   fields: z.array(FormFieldSchema).min(1, "Form must have at least one field"),
