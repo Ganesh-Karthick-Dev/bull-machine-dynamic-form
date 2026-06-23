@@ -92,6 +92,10 @@ export function buildFormSchema(fields: FormField[]) {
         }
         break;
 
+      case 'hidden':
+        fieldSchema = z.coerce.string().optional().or(z.literal(''));
+        break;
+
       default:
         fieldSchema = z.any();
     }

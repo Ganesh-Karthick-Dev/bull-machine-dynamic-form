@@ -8,7 +8,8 @@ export const FormFieldTypeSchema = z.enum([
   'textarea',
   'select',
   'checkbox',
-  'radio'
+  'radio',
+  'hidden'
 ]);
 
 export type FormFieldType = z.infer<typeof FormFieldTypeSchema>;

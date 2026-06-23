@@ -150,10 +150,41 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    // 1. Extract top-level fields
+    const vendorName = data.vendorName || "";
+    const vendorEmail = data.vendorEmail || "";
+    const vendorNumber = data.vendorNumber || "";
+    const poNo = data.poNo || "";
+    const comments = data.comments || "";
+
+    // 2. Build the answers array grouped by PO Item No
+    const answers: Array<{ poItemNo: string; material: string; date: string }> = [];
+    
+    Object.keys(data).forEach((key) => {
+      if (key.startsWith('date_')) {
+        const itemNo = key.replace('date_', '');
+        const dateValue = data[key];
+        const materialValue = data[`material_${itemNo}`] || "";
+        
+        if (dateValue) {
+          answers.push({
+            poItemNo: itemNo,
+            material: materialValue,
+            date: dateValue,
+          });
+        }
+      }
+    });
+
     const payload = {
       submittedAt: new Date().toISOString(),
       formTitle: config.title,
-      answers: data,
+      vendorName,
+      vendorEmail,
+      vendorNumber,
+      poNo,
+      comments,
+      answers,
     };
 
     try {

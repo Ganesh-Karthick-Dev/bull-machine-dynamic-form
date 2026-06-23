@@ -27,6 +27,16 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
   const isError = !!error;
   const [dateOpen, setDateOpen] = useState(false);
 
+  if (field.type === 'hidden') {
+    return (
+      <input
+        type="hidden"
+        id={field.id}
+        {...register(field.id)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-2 w-full animate-fadeIn">
       {field.type !== 'checkbox' && (
