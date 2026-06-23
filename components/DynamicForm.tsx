@@ -7,24 +7,24 @@ import { FormConfig } from '@/lib/schema-parser';
 import { buildFormSchema, getDefaultValues } from '@/lib/validators';
 import { FormField } from './FormField';
 import confetti from 'canvas-confetti';
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  Loader2, 
-  Copy, 
-  Check, 
-  RotateCcw, 
-  Sparkles, 
-  Moon, 
-  Sun 
+import {
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+  Copy,
+  Check,
+  RotateCcw,
+  Sparkles,
+  Moon,
+  Sun
 } from 'lucide-react';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
-  CardFooter 
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -40,7 +40,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
   const [submittedPayload, setSubmittedPayload] = useState<any>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isMounted, setIsMounted] = useState(false);
-  
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [isStuck, setIsStuck] = useState(false);
 
@@ -128,7 +128,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
   const getProgress = () => {
     const totalFields = config.fields.length;
     if (totalFields === 0) return 0;
-    
+
     let filledCount = 0;
     config.fields.forEach((field) => {
       const val = formValues[field.id];
@@ -159,13 +159,13 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
 
     // 2. Build the answers array grouped by PO Item No
     const answers: Array<{ poItemNo: string; material: string; date: string }> = [];
-    
+
     Object.keys(data).forEach((key) => {
       if (key.startsWith('date_')) {
         const itemNo = key.replace('date_', '');
         const dateValue = data[key];
         const materialValue = data[`material_${itemNo}`] || "";
-        
+
         if (dateValue) {
           answers.push({
             poItemNo: itemNo,
@@ -188,7 +188,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
     };
 
     try {
-      const response = await fetch("https://automation.webnoxdigital.com/webhook/aa388fca-baf3-487f-a588-e244f5248a67", {
+      const response = await fetch("https://automation.webnoxdigital.com/webhook-test/aa388fca-baf3-487f-a588-e244f5248a67", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
 
       // Success! Clear draft
       localStorage.removeItem(DRAFT_KEY);
-      
+
       // Play confetti
       confetti({
         particleCount: 150,
@@ -313,15 +313,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
       <div ref={sentinelRef} className="absolute top-0 left-0 right-0 h-px pointer-events-none" />
 
       {/* Sticky Header Section */}
-      <div className={`sticky top-0 z-20 bg-card rounded-t-xl transition-shadow duration-300 ${
-        isStuck 
-          ? "shadow-xl border-b border-border/80" 
+      <div className={`sticky top-0 z-20 bg-card rounded-t-xl transition-shadow duration-300 ${isStuck
+          ? "shadow-xl border-b border-border/80"
           : "border-b border-border/60"
-      }`}>
+        }`}>
         {/* Top Progress bar */}
         <div className="w-full h-1.5 bg-muted rounded-t-xl overflow-hidden">
-          <div 
-            className="h-full bg-primary rounded-r transition-all duration-300 ease-out" 
+          <div
+            className="h-full bg-primary rounded-r transition-all duration-300 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
