@@ -216,7 +216,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
   if (submitState === 'success') {
     return (
       <Card className="w-full max-w-2xl mx-auto border shadow-xl p-8 text-center animate-scaleIn">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 dark:bg-green-950/20 text-green-500 dark:text-green-400 mb-6">
+        <div className="mx-auto inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-50 dark:bg-green-950/20 text-green-500 dark:text-green-400 mb-6">
           <CheckCircle2 className="h-10 w-10" />
         </div>
         <CardTitle className="text-2xl font-bold text-foreground mb-2">
@@ -225,35 +225,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
         <CardDescription className="text-muted-foreground mb-6 max-w-md mx-auto text-base">
           {config.successMessage}
         </CardDescription>
-
-        {submittedPayload && (
-          <div className="mb-6 text-left border rounded-lg overflow-hidden bg-muted/20">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b bg-muted/40">
-              <span className="text-xs font-semibold text-muted-foreground">Response Payload</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyPayload}
-                className="h-7 text-xs flex items-center gap-1.5 hover:bg-muted text-primary"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" />
-                    Copy JSON
-                  </>
-                )}
-              </Button>
-            </div>
-            <pre className="p-4 text-xs font-mono text-foreground overflow-x-auto max-h-60">
-              {JSON.stringify(submittedPayload, null, 2)}
-            </pre>
-          </div>
-        )}
 
         <div className="flex justify-center">
           <Button
