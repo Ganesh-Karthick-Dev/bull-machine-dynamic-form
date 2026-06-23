@@ -15,7 +15,7 @@ export function buildFormSchema(fields: FormField[]) {
       case 'textarea':
       case 'select':
       case 'radio':
-        fieldSchema = z.string();
+        fieldSchema = z.coerce.string();
         if (field.required) {
           fieldSchema = (fieldSchema as z.ZodString).min(1, { message: `${field.label} is required` });
         } else {
@@ -25,7 +25,7 @@ export function buildFormSchema(fields: FormField[]) {
         break;
 
       case 'email':
-        fieldSchema = z.string();
+        fieldSchema = z.coerce.string();
         if (field.required) {
           fieldSchema = (fieldSchema as z.ZodString)
             .min(1, { message: `${field.label} is required` })
@@ -68,7 +68,7 @@ export function buildFormSchema(fields: FormField[]) {
 
       case 'date':
         // HTML date picker returns "YYYY-MM-DD"
-        fieldSchema = z.string();
+        fieldSchema = z.coerce.string();
         if (field.required) {
           fieldSchema = (fieldSchema as z.ZodString)
             .min(1, { message: `${field.label} is required` })
