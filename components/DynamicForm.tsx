@@ -188,7 +188,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
     };
 
     try {
-      const response = await fetch("https://automation.webnoxdigital.com-test/webhook/aa388fca-baf3-487f-a588-e244f5248a67", {
+      const response = await fetch("https://automation.webnoxdigital.com/webhook-test/aa388fca-baf3-487f-a588-e244f5248a67", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
