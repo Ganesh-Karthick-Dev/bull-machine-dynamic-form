@@ -12,8 +12,6 @@ import {
   Code, 
   FileText, 
   Eye, 
-  Moon, 
-  Sun, 
   Hammer,
   RotateCcw
 } from 'lucide-react';
@@ -24,7 +22,6 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Preset configurations
 const PRESETS = {
@@ -71,7 +68,7 @@ const PRESETS = {
   }
 };
 
-export default function Home() {
+export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'visual' | 'json'>('visual');
   const [jsonText, setJsonText] = useState('');
   const [title, setTitle] = useState(PRESETS.vendor.title);
@@ -84,23 +81,6 @@ export default function Home() {
   const [generatedLink, setGeneratedLink] = useState('');
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  // Initialize theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark');
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    localStorage.setItem('theme', nextTheme);
-    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
-  };
 
   // Sync state to URL Generator
   useEffect(() => {
@@ -225,66 +205,48 @@ export default function Home() {
   };
 
   return (
-    <div className="flex-1 bg-background text-foreground min-h-screen flex flex-col font-sans transition-all duration-300">
-      
-      {/* Navbar */}
-      <header className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-10 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shadow-md">
-              <Hammer className="h-5 w-5" />
-            </div>
-            <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-              Dynamic Form Engine
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 flex-wrap">
-            {/* Presets Select */}
-            <div className="flex items-center gap-2 bg-muted/50 border px-3 py-1.5 rounded-lg">
-              <span className="text-xs text-muted-foreground font-medium whitespace-nowrap">Load Preset:</span>
-              <select 
-                onChange={(e) => loadPreset(e.target.value as any)}
-                className="text-xs bg-transparent focus:outline-none font-bold text-foreground cursor-pointer"
-                defaultValue="vendor"
-              >
-                <option value="vendor" className="bg-popover text-popover-foreground">Vendor Delivery</option>
-                <option value="feedback" className="bg-popover text-popover-foreground">Feedback Survey</option>
-                <option value="event" className="bg-popover text-popover-foreground">Event RSVP</option>
-              </select>
-            </div>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-9 w-9 text-muted-foreground hover:text-foreground"
-              aria-label="Toggle Theme"
+    <div className="flex-1 flex flex-col gap-5 font-sans">
+      {/* Sub Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3.5 border-b border-border/80">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">Form Builder Settings</h1>
+          <p className="text-xs text-muted-foreground">Configure field schema, webhooks, validation rules, and share parameters.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Presets Select */}
+          <div className="flex items-center gap-2 bg-muted/50 border border-border/80 px-2.5 py-1 rounded-md shadow-sm">
+            <span className="text-[11px] text-muted-foreground font-medium whitespace-nowrap">Load Preset:</span>
+            <select 
+              onChange={(e) => loadPreset(e.target.value as any)}
+              className="text-[11px] bg-transparent focus:outline-none font-bold text-foreground cursor-pointer"
+              defaultValue="vendor"
             >
-              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </Button>
+              <option value="vendor" className="bg-popover text-popover-foreground">Vendor Delivery</option>
+              <option value="feedback" className="bg-popover text-popover-foreground">Feedback Survey</option>
+              <option value="event" className="bg-popover text-popover-foreground">Event RSVP</option>
+            </select>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Builder Area */}
-      <main className="max-w-7xl mx-auto px-6 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full items-start">
         
         {/* Left builder column */}
-        <section className="lg:col-span-7 flex flex-col gap-6">
-          <Card className="shadow-xl overflow-hidden flex-1 flex flex-col border border-border">
+        <section className="lg:col-span-7 flex flex-col gap-5">
+          <Card className="shadow-sm overflow-hidden flex-1 flex flex-col border border-border">
             
             {/* Form editor tabs */}
             <div className="flex border-b bg-muted/20">
               <button
                 onClick={() => setActiveTab('visual')}
-                className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 border-b-2 transition-all ${
+                className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-2 border-b-2 transition-all ${
                   activeTab === 'visual'
-                    ? 'border-primary text-primary'
+                    ? 'border-primary text-primary bg-background/50'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-3.5 w-3.5" />
                 Visual Form Builder
               </button>
               <button
@@ -300,73 +262,73 @@ export default function Home() {
                   };
                   setJsonText(JSON.stringify(visualConfig, null, 2));
                 }}
-                className={`flex-1 py-4 text-sm font-semibold flex items-center justify-center gap-2 border-b-2 transition-all ${
+                className={`flex-1 py-3 text-xs font-semibold flex items-center justify-center gap-2 border-b-2 transition-all ${
                   activeTab === 'json'
-                    ? 'border-primary text-primary'
+                    ? 'border-primary text-primary bg-background/50'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Code className="h-4 w-4" />
+                <Code className="h-3.5 w-3.5" />
                 JSON Schema Editor
               </button>
             </div>
 
             {/* Editor Body */}
-            <div className="p-6 overflow-y-auto flex-1 max-h-[60vh] lg:max-h-[calc(100vh-270px)]">
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 max-h-[60vh] lg:max-h-[calc(100vh-270px)]">
               {activeTab === 'visual' ? (
-                <div className="space-y-6">
+                <div className="space-y-5">
                   {/* General Config */}
-                  <div className="space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Form Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-2">
-                        <Label htmlFor="form-title" className="text-xs font-semibold text-muted-foreground">Form Title</Label>
+                  <div className="space-y-3">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Form Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="form-title" className="text-[10px] font-semibold text-muted-foreground">Form Title</Label>
                         <Input
                           id="form-title"
                           type="text"
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
-                          className="h-10"
+                          className="h-9 text-xs"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="form-webhook" className="text-xs font-semibold text-muted-foreground">Webhook URL (n8n)</Label>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="form-webhook" className="text-[10px] font-semibold text-muted-foreground">Webhook URL (n8n)</Label>
                         <Input
                           id="form-webhook"
                           type="url"
                           value={webhookUrl}
                           onChange={(e) => setWebhookUrl(e.target.value)}
-                          className="h-10"
+                          className="h-9 text-xs"
                         />
                       </div>
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="form-desc" className="text-xs font-semibold text-muted-foreground">Description</Label>
+                      <div className="space-y-1.5 md:col-span-2">
+                        <Label htmlFor="form-desc" className="text-[10px] font-semibold text-muted-foreground">Description</Label>
                         <Input
                           id="form-desc"
                           type="text"
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
-                          className="h-10"
+                          className="h-9 text-xs"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="form-btn-text" className="text-xs font-semibold text-muted-foreground">Submit Button Text</Label>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="form-btn-text" className="text-[10px] font-semibold text-muted-foreground">Submit Button Text</Label>
                         <Input
                           id="form-btn-text"
                           type="text"
                           value={submitButtonText}
                           onChange={(e) => setSubmitButtonText(e.target.value)}
-                          className="h-10"
+                          className="h-9 text-xs"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="form-success-msg" className="text-xs font-semibold text-muted-foreground">Success Message</Label>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="form-success-msg" className="text-[10px] font-semibold text-muted-foreground">Success Message</Label>
                         <Input
                           id="form-success-msg"
                           type="text"
                           value={successMessage}
                           onChange={(e) => setSuccessMessage(e.target.value)}
-                          className="h-10"
+                          className="h-9 text-xs"
                         />
                       </div>
                     </div>
@@ -548,19 +510,19 @@ export default function Home() {
         </section>
 
         {/* Right Preview column */}
-        <section className="lg:col-span-5 flex flex-col gap-6">
-          <Card className="shadow-xl p-6 space-y-6 border border-border">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+        <section className="lg:col-span-5 flex flex-col gap-5">
+          <Card className="shadow-sm p-4 sm:p-5 space-y-5 border border-border">
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+              <Sparkles className="h-4.5 w-4.5 text-primary" />
               Your Shareable Form
             </h3>
 
-            <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl space-y-3">
-              <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+            <div className="p-3.5 bg-primary/5 border border-primary/10 rounded-lg space-y-2.5">
+              <p className="text-[11px] text-muted-foreground font-medium leading-relaxed">
                 This dynamic form runs entirely database-free. All fields, layouts, labels, and webhooks are safely serialized into the URL below.
               </p>
               
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label className="text-[10px] font-bold text-muted-foreground uppercase">Generated Form Link</Label>
                 <div className="flex gap-2">
                   <Input
@@ -573,7 +535,7 @@ export default function Home() {
                     onClick={handleCopyLink}
                     disabled={!!jsonError}
                     size="icon"
-                    className="h-9 w-9"
+                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
                     title="Copy Form URL"
                   >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -582,7 +544,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <Link
                 href={jsonError ? "#" : generatedLink.replace(typeof window !== 'undefined' ? window.location.origin : '', '')}
                 onClick={(e) => {
@@ -590,22 +552,22 @@ export default function Home() {
                 }}
                 target="_blank"
                 className={cn(
-                  buttonVariants({ variant: "default", size: "lg" }),
-                  "w-full h-11 font-semibold shadow-md flex items-center justify-center gap-2",
+                  buttonVariants({ variant: "default", size: "sm" }),
+                  "w-full h-9 text-xs font-semibold shadow-sm flex items-center justify-center gap-2",
                   jsonError && "opacity-50 pointer-events-none"
                 )}
               >
-                <Eye className="h-4.5 w-4.5" />
+                <Eye className="h-4 w-4" />
                 Open & Test Form
-                <ExternalLink className="h-3.5 w-3.5 ml-0.5" />
+                <ExternalLink className="h-3 w-3 ml-0.5" />
               </Link>
             </div>
 
             <hr className="border-border/60" />
 
-            <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Features Checklist</h4>
-              <div className="grid grid-cols-1 gap-2.5 text-xs">
+            <div className="space-y-3">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Features Checklist</h4>
+              <div className="grid grid-cols-1 gap-1.5 text-[11px]">
                 <div className="flex items-center gap-2 font-medium text-muted-foreground">
                   <div className="h-1.5 w-1.5 bg-green-500 rounded-full" />
                   Next.js 15/16 App Router & TypeScript
@@ -634,7 +596,7 @@ export default function Home() {
             </div>
           </Card>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

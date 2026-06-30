@@ -85,7 +85,7 @@ function ErrorState({ title, message, icon: Icon, details }: ErrorStateProps) {
         )}
 
         <Link 
-          href="/"
+          href="/settings"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white dark:bg-white dark:hover:bg-gray-100 dark:text-gray-950 rounded-lg text-sm font-semibold transition-all w-full justify-center shadow-sm"
         >
           <ArrowLeft className="h-4 w-4" />

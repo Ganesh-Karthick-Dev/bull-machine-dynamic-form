@@ -188,7 +188,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
     };
 
     try {
-      const response = await fetch("https://automation.webnoxdigital.com/webhook/aa388fca-baf3-487f-a588-e244f5248a67", {
+      const response = await fetch("https://automation.webnoxdigital.com/webhook-test/aa388fca-baf3-487f-a588-e244f5248a67", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -314,8 +314,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ config }) => {
 
       {/* Sticky Header Section */}
       <div className={`sticky top-0 z-20 bg-card rounded-t-xl transition-shadow duration-300 ${isStuck
-          ? "shadow-xl border-b border-border/80"
-          : "border-b border-border/60"
+        ? "shadow-xl border-b border-border/80"
+        : "border-b border-border/60"
         }`}>
         {/* Top Progress bar */}
         <div className="w-full h-1.5 bg-muted rounded-t-xl overflow-hidden">
