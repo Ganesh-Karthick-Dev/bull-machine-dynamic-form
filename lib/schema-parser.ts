@@ -25,6 +25,8 @@ export const FormFieldSchema = z.object({
   placeholder: z.string().optional(),
   options: z.array(z.string()).optional(),
   disabled: z.boolean().optional(),
+  currentStock: z.number().optional(),
+  minStock: z.number().optional(),
 });
 
 export type FormField = z.infer<typeof FormFieldSchema>;

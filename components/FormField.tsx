@@ -156,43 +156,77 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
             const date = value ? parseISO(value) : undefined;
             const displayValue = date && isValid(date) ? format(date, "PPP") : (field.placeholder || "Pick a date");
 
+            const currentStock = field.currentStock;
+            const minStock = field.minStock;
+            const hasStockInfo = currentStock !== undefined && minStock !== undefined;
+            const daysOfStock = hasStockInfo && minStock > 0 ? (currentStock / minStock) : 999;
+            const isLowStock = hasStockInfo && daysOfStock < 3;
+
             return (
-              <Popover open={dateOpen} onOpenChange={setDateOpen}>
-                <PopoverTrigger
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "w-full h-10 px-3.5 text-left font-normal justify-start gap-2 bg-transparent rounded-lg border",
-                    !value && "text-muted-foreground",
-                    isError 
-                      ? 'border-destructive focus-visible:border-destructive' 
-                      : 'border-border focus-visible:border-primary'
-                  )}
-                  type="button"
-                >
-                  <CalendarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span>{displayValue}</span>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(selectedDate) => {
-                      if (selectedDate) {
-                        onChange(format(selectedDate, "yyyy-MM-dd"));
-                      } else {
-                        onChange("");
-                      }
-                      setDateOpen(false); // Close calendar popover on date select
-                    }}
-                    disabled={(date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return date < today;
-                    }}
-                    autoFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="flex flex-col gap-1.5 w-full">
+                <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                  <PopoverTrigger
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "w-full h-10 px-3.5 text-left font-normal justify-start gap-2 bg-transparent rounded-lg border",
+                      !value && "text-muted-foreground",
+                      isError 
+                        ? 'border-destructive focus-visible:border-destructive' 
+                        : 'border-border focus-visible:border-primary'
+                    )}
+                    type="button"
+                  >
+                    <CalendarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span>{displayValue}</span>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={(selectedDate) => {
+                        if (selectedDate) {
+                          onChange(format(selectedDate, "yyyy-MM-dd"));
+                        } else {
+                          onChange("");
+                        }
+                        setDateOpen(false); // Close calendar popover on date select
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        const compareDate = new Date(date);
+                        compareDate.setHours(0, 0, 0, 0);
+
+                        if (isLowStock) {
+                          return compareDate.getTime() !== today.getTime();
+                        } else {
+                          return compareDate < today;
+                        }
+                      }}
+                      autoFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                {hasStockInfo && (
+                  <div className={cn(
+                    "text-[10px] font-bold px-2 py-1 rounded-md border flex items-center gap-1.5 self-start",
+                    isLowStock 
+                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20" 
+                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                  )}>
+                    <span className={cn(
+                      "h-1.5 w-1.5 rounded-full animate-pulse",
+                      isLowStock ? "bg-amber-500" : "bg-emerald-500"
+                    )} />
+                    {isLowStock ? (
+                      <span>Low Stock Alert ({daysOfStock.toFixed(1)} days left) — Delivery date restricted to today only.</span>
+                    ) : (
+                      <span>Stock Status: Healthy ({daysOfStock.toFixed(1)} days left)</span>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           }}
         />

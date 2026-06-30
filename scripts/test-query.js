@@ -16,11 +16,14 @@ async function main() {
   const ordersCount = await client.query("SELECT COUNT(*) FROM overdue_orders");
   console.log("Orders count in DB:", ordersCount.rows[0].count);
   
-  const stocksCount = await client.query("SELECT COUNT(*) FROM stocks");
-  console.log("Stocks count in DB:", stocksCount.rows[0].count);
-  
-  const sampleOrders = await client.query("SELECT * FROM overdue_orders LIMIT 3");
-  console.log("Sample Orders:", sampleOrders.rows);
+  const countRes = await client.query("SELECT COUNT(*) FROM stocks");
+  console.log("Total stocks rows:", countRes.rows[0].count);
+
+  const uniqueRes = await client.query("SELECT COUNT(DISTINCT item) FROM stocks");
+  console.log("Unique stocks items:", uniqueRes.rows[0].count);
+
+  const dupRes = await client.query("SELECT item, COUNT(*) FROM stocks GROUP BY item HAVING COUNT(*) > 1 LIMIT 5");
+  console.log("Sample duplicate items:", dupRes.rows);
   
   await client.end();
 }
