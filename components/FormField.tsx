@@ -183,6 +183,11 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
                       }
                       setDateOpen(false); // Close calendar popover on date select
                     }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
                     autoFocus
                   />
                 </PopoverContent>
