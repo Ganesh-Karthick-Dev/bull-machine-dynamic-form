@@ -112,7 +112,12 @@ async function main() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log("Tables created successfully.");
+    
+    console.log("Creating database indexes for joins...");
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_overdue_orders_material ON overdue_orders(material)`);
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_stocks_material ON stocks(material)`);
+    
+    console.log("Tables and indexes created successfully.");
 
     // 2. Import Overdue Orders
     const poFile = path.join(process.cwd(), 'doc', 'bull machine - po.xlsx');
@@ -197,6 +202,11 @@ async function main() {
     }
     await client.query("COMMIT");
     console.log(`Successfully imported ${stocksRows.length} stock items.`);
+
+    const checkOrders = await client.query("SELECT COUNT(*) FROM overdue_orders");
+    const checkStocks = await client.query("SELECT COUNT(*) FROM stocks");
+    console.log(`Verification: overdue_orders count = ${checkOrders.rows[0].count}`);
+    console.log(`Verification: stocks count = ${checkStocks.rows[0].count}`);
 
     console.log("\nALL XLSX DATA IMPORTED SUCCESSFULLY TO POSTGRESQL!");
   } catch (error) {
