@@ -19,12 +19,15 @@ import {
   Clock,
   ArrowRight,
   TrendingDown,
-  Info
+  Info,
+  Upload
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import ImportExcelModal from '@/components/ImportExcelModal';
+import ClearDatabaseModal from '@/components/ClearDatabaseModal';
 
 interface OverdueOrder {
   id: number;
@@ -93,6 +96,8 @@ export default function OverdueOrdersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
   
   const [currentOrder, setCurrentOrder] = useState<Partial<OverdueOrder>>(emptyOrder);
   const [selectedOrder, setSelectedOrder] = useState<OverdueOrder | null>(null);
@@ -230,14 +235,34 @@ export default function OverdueOrdersPage() {
           </h1>
           <p className="text-xs text-muted-foreground">Log, monitor, and execute alerts for orders past their committed delivery schedules.</p>
         </div>
-        <Button 
-          onClick={handleOpenCreate}
-          size="sm"
-          className="font-bold text-xs h-9 shadow-sm shadow-primary/10 flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          Add Overdue Order
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => setClearOpen(true)}
+            variant="destructive"
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete Data
+          </Button>
+          <Button 
+            onClick={() => setImportOpen(true)}
+            variant="outline"
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm flex items-center gap-1.5 self-start sm:self-auto border-dashed hover:bg-muted/50"
+          >
+            <Upload className="h-3.5 w-3.5 text-muted-foreground" />
+            Import Excel
+          </Button>
+          <Button 
+            onClick={handleOpenCreate}
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm shadow-primary/10 flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <Plus className="h-4 w-4" />
+            Add Overdue Order
+          </Button>
+        </div>
       </div>
 
 
@@ -983,6 +1008,19 @@ export default function OverdueOrdersPage() {
           </div>
         </div>
       )}
+      {/* --- IMPORT EXCEL MODAL --- */}
+      <ImportExcelModal
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        type="overdue"
+        onSuccess={fetchOrders}
+      />
+      {/* --- CLEAR DATABASE MODAL --- */}
+      <ClearDatabaseModal
+        isOpen={clearOpen}
+        onClose={() => setClearOpen(false)}
+        onSuccess={fetchOrders}
+      />
 
     </>
   );

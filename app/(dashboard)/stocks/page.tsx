@@ -14,12 +14,15 @@ import {
   Package,
   TrendingDown,
   ChevronRight,
-  ShieldAlert
+  ShieldAlert,
+  Upload
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import ImportExcelModal from '@/components/ImportExcelModal';
+import ClearDatabaseModal from '@/components/ClearDatabaseModal';
 
 interface StockItem {
   id: number;
@@ -52,6 +55,8 @@ export default function StocksPage() {
   // Modals state
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
   
   const [currentStock, setCurrentStock] = useState<Partial<StockItem>>(emptyStock);
   const [selectedStock, setSelectedStock] = useState<StockItem | null>(null);
@@ -166,14 +171,34 @@ export default function StocksPage() {
           </h1>
           <p className="text-xs text-muted-foreground">Monitor real-time warehouse quantities, track minimum thresholds, and adjust inventory.</p>
         </div>
-        <Button 
-          onClick={handleOpenCreate}
-          size="sm"
-          className="font-bold text-xs h-9 shadow-sm shadow-primary/10 flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <Plus className="h-4 w-4" />
-          Add Stock Item
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => setClearOpen(true)}
+            variant="destructive"
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete Data
+          </Button>
+          <Button 
+            onClick={() => setImportOpen(true)}
+            variant="outline"
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm flex items-center gap-1.5 self-start sm:self-auto border-dashed hover:bg-muted/50"
+          >
+            <Upload className="h-3.5 w-3.5 text-muted-foreground" />
+            Import Excel
+          </Button>
+          <Button 
+            onClick={handleOpenCreate}
+            size="sm"
+            className="font-bold text-xs h-9 shadow-sm shadow-primary/10 flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <Plus className="h-4 w-4" />
+            Add Stock Item
+          </Button>
+        </div>
       </div>
 
 
@@ -487,6 +512,19 @@ export default function StocksPage() {
           </div>
         </div>
       )}
+      {/* --- IMPORT EXCEL MODAL --- */}
+      <ImportExcelModal
+        isOpen={importOpen}
+        onClose={() => setImportOpen(false)}
+        type="stocks"
+        onSuccess={fetchStocks}
+      />
+      {/* --- CLEAR DATABASE MODAL --- */}
+      <ClearDatabaseModal
+        isOpen={clearOpen}
+        onClose={() => setClearOpen(false)}
+        onSuccess={fetchStocks}
+      />
 
     </>
   );

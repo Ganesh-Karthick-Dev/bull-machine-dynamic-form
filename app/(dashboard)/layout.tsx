@@ -58,12 +58,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       description: 'System stats & recent forms'
     },
     {
-      name: 'Form Builder',
-      href: '/settings',
-      icon: Sliders,
-      description: 'Visual & JSON generator'
-    },
-    {
       name: 'Order Overdue',
       href: '/overdue',
       icon: FileClock,
@@ -122,10 +116,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Hammer className="h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                FormEngine
+              <span className="font-extrabold text-sm leading-none tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                Bull Machine
               </span>
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Zero-DB Platform</span>
+              <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Automation</span>
             </div>
           </Link>
           <Button 
@@ -170,19 +164,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           })}
         </nav>
 
-        {/* Sidebar Footer / User Profile */}
-        <div className="border-t border-border/80 p-3 bg-zinc-100/50 dark:bg-zinc-900/30">
-          <div className="flex items-center gap-2.5 rounded-lg p-1.5 bg-background border border-border/50 shadow-sm">
-            <div className="h-8 w-8 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center justify-center border border-indigo-500/20">
-              GK
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <h4 className="text-[11px] font-bold text-foreground truncate">Ganesh Karthick</h4>
-              <p className="text-[9px] text-muted-foreground truncate font-medium">Developer Account</p>
-            </div>
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20 animate-pulse" title="System Online" />
-          </div>
-        </div>
       </aside>
 
       {/* Main Wrapper */}

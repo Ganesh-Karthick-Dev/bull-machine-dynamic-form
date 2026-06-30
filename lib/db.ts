@@ -14,6 +14,11 @@ export const query = (text: string, params?: any[]) => {
   return pool.query(text, params);
 };
 
+// Helper function to get a client from pool for transactions
+export const getClient = () => {
+  return pool.connect();
+};
+
 // Database Initialization & Seeding logic
 export const initDatabase = async () => {
   try {
