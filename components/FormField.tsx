@@ -160,7 +160,8 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
             const minStock = field.minStock;
             const hasStockInfo = currentStock !== undefined && minStock !== undefined;
             const daysOfStock = hasStockInfo && minStock > 0 ? (currentStock / minStock) : 999;
-            const isLowStock = hasStockInfo && daysOfStock < 3;
+            const allowedDays = hasStockInfo ? Math.max(0, Math.floor(daysOfStock) - 2) : 999;
+            const isLowStock = hasStockInfo && allowedDays === 0;
 
             return (
               <div className="flex flex-col gap-1.5 w-full">
@@ -189,7 +190,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
                         } else {
                           onChange("");
                         }
-                        setDateOpen(false); // Close calendar popover on date select
+                        setDateOpen(false);
                       }}
                       disabled={(date) => {
                         const today = new Date();
@@ -198,8 +199,12 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
                         const compareDate = new Date(date);
                         compareDate.setHours(0, 0, 0, 0);
 
-                        if (isLowStock) {
-                          return compareDate.getTime() !== today.getTime();
+                        if (hasStockInfo) {
+                          const maxAllowedDate = new Date(today);
+                          maxAllowedDate.setDate(today.getDate() + allowedDays);
+                          maxAllowedDate.setHours(0, 0, 0, 0);
+
+                          return compareDate < today || compareDate > maxAllowedDate;
                         } else {
                           return compareDate < today;
                         }
@@ -222,7 +227,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
                     {isLowStock ? (
                       <span>Low Stock Alert ({daysOfStock.toFixed(1)} days left) — Delivery date restricted to today only.</span>
                     ) : (
-                      <span>Stock Status: Healthy ({daysOfStock.toFixed(1)} days left)</span>
+                      <span>Stock Status: Healthy ({daysOfStock.toFixed(1)} days left) — Can select up to {allowedDays} days in future.</span>
                     )}
                   </div>
                 )}
