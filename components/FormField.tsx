@@ -54,6 +54,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
       {field.type === 'textarea' ? (
         <Textarea
           id={field.id}
+          disabled={field.disabled}
           placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
           {...register(field.id)}
           className={`min-h-[110px] w-full text-base sm:text-sm px-3.5 py-2.5 rounded-lg border focus-visible:ring-2 focus-visible:ring-primary/20 ${
@@ -199,6 +200,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
         <Input
           id={field.id}
           type={field.type}
+          disabled={field.disabled}
           placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
           {...register(field.id)}
           className={`h-10 w-full text-base sm:text-sm px-3.5 py-2 rounded-lg border focus-visible:ring-2 focus-visible:ring-primary/20 ${
