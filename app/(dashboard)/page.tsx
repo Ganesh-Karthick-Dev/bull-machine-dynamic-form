@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -8,10 +8,6 @@ import {
   Check, 
   ExternalLink, 
   Plus, 
-  FileText, 
-  Activity, 
-  Globe, 
-  CheckCircle2, 
   TrendingUp, 
   ArrowRight,
   BookOpen,
@@ -20,60 +16,41 @@ import {
   FileClock,
   Boxes,
   Database,
-  AlertTriangle
+  AlertTriangle,
+  Globe
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-// Presets data for link generation
-const PRESETS = {
-  vendor: {
-    title: "Vendor Delivery Update",
-    description: "Please provide delivery dates and comments",
-    webhookUrl: "https://n8n.example.com/webhook/vendor-update",
-    submitButtonText: "Submit Update",
-    successMessage: "Thank you. Your response has been submitted successfully.",
-    fields: [
-      { id: "vendorName", label: "Vendor Name", type: "text", required: true, defaultValue: "ABC Pvt Ltd" },
-      { id: "material1", label: "Material 1 Delivery Date", type: "date", required: true },
-      { id: "material2", label: "Material 2 Delivery Date", type: "date", required: true },
-      { id: "comments", label: "Comments", type: "textarea", required: false }
-    ]
-  },
-  feedback: {
-    title: "Customer Satisfaction Survey",
-    description: "Help us improve our service by answering a few short questions",
-    webhookUrl: "https://n8n.example.com/webhook/customer-feedback",
-    submitButtonText: "Send Feedback",
-    successMessage: "Thank you! We appreciate your valuable feedback.",
-    fields: [
-      { id: "fullName", label: "Full Name", type: "text", required: false, placeholder: "John Doe" },
-      { id: "email", label: "Email Address", type: "email", required: true, placeholder: "john@example.com" },
-      { id: "rating", label: "Satisfaction Level", type: "radio", required: true, options: ["Excellent", "Good", "Average", "Poor"] },
-      { id: "recommend", label: "Would you recommend us?", type: "checkbox", required: false, defaultValue: "true" },
-      { id: "details", label: "Additional Feedback", type: "textarea", required: false }
-    ]
-  },
-  event: {
-    title: "Product Launch RSVP",
-    description: "Reserve your spot for our upcoming virtual event",
-    webhookUrl: "https://n8n.example.com/webhook/event-rsvp",
-    submitButtonText: "Register Now",
-    successMessage: "RSVP Confirmed! Check your email for event details.",
-    fields: [
-      { id: "firstName", label: "First Name", type: "text", required: true },
-      { id: "lastName", label: "Last Name", type: "text", required: true },
-      { id: "jobTitle", label: "Job Title", type: "select", required: true, options: ["Developer", "Designer", "Product Manager", "Executive", "Other"] },
-      { id: "guestsCount", label: "Number of Guests", type: "number", required: true, defaultValue: "1" },
-      { id: "dietary", label: "Dietary Restrictions", type: "text", required: false, placeholder: "e.g., Vegan, Gluten-free" }
-    ]
-  }
-};
+interface OverdueOrder {
+  id: number;
+  plant: string;
+  purchasing_group: string;
+  material: string;
+  mat_desc: string;
+  vendor_code: string;
+  vendor_name: string;
+  vendor_number: string;
+  vendor_email: string;
+  po_no: string;
+  order_due_date: string;
+  po_item_no: string;
+  uom: string;
+  delivery_schedule_qty: number;
+  pending_qty: number;
+  despatch_date_supplier: string | null;
+  delivery_date_bull: string | null;
+  asn_number: string | null;
+  further_despatch_date: string | null;
+  form_id: string | null;
+  thanking_you_email: string | null;
+  trigger_id: string | null;
+  first_mail_sent: string | null;
+}
 
 export default function DashboardOverview() {
-  const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
-  const [formLinks, setFormLinks] = useState<{ [key: string]: string }>({});
-
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [recentOrders, setRecentOrders] = useState<OverdueOrder[]>([]);
   const [dbStats, setDbStats] = useState({
     overdueOrdersCount: 0,
     stockItemsCount: 0,
@@ -81,23 +58,10 @@ export default function DashboardOverview() {
     lowStockAlertsCount: 0
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? window.location.origin : '';
-    const links: { [key: string]: string } = {};
-    
-    Object.entries(PRESETS).forEach(([key, preset]) => {
-      const jsonStr = JSON.stringify(preset);
-      const base64 = Buffer.from(jsonStr).toString('base64')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-      links[key] = `${host}/form?data=${base64}`;
-    });
-    
-    setFormLinks(links);
-
-    // Fetch live metrics from local postgres overview API
+    // 1. Fetch live metrics from overview API
     const fetchStats = async () => {
       try {
         const res = await fetch('/api/overview');
@@ -111,13 +75,30 @@ export default function DashboardOverview() {
         setStatsLoading(false);
       }
     };
+
+    // 2. Fetch recent overdue orders
+    const fetchRecentOrders = async () => {
+      try {
+        const res = await fetch('/api/orders?page=1&limit=5');
+        if (res.ok) {
+          const data = await res.json();
+          setRecentOrders(data.data || []);
+        }
+      } catch (e) {
+        console.error("Failed to load recent orders:", e);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
     fetchStats();
+    fetchRecentOrders();
   }, []);
 
-  const handleCopyLink = (key: string, url: string) => {
+  const handleCopyLink = (id: number, url: string) => {
     navigator.clipboard.writeText(url);
-    setCopiedIndex(key);
-    setTimeout(() => setCopiedIndex(null), 2000);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const metrics = [
@@ -157,33 +138,6 @@ export default function DashboardOverview() {
     }
   ];
 
-  const recentForms = [
-    {
-      key: "vendor",
-      name: "Vendor Delivery Update",
-      fieldsCount: 4,
-      webhook: "https://n8n.example.com/webhook/vendor-update",
-      submissions: 412,
-      status: "Active"
-    },
-    {
-      key: "feedback",
-      name: "Customer Satisfaction Survey",
-      fieldsCount: 5,
-      webhook: "https://n8n.example.com/webhook/customer-feedback",
-      submissions: 864,
-      status: "Active"
-    },
-    {
-      key: "event",
-      name: "Product Launch RSVP",
-      fieldsCount: 5,
-      webhook: "https://n8n.example.com/webhook/event-rsvp",
-      submissions: 206,
-      status: "Active"
-    }
-  ];
-
   return (
     <div className="space-y-5 animate-fadeIn">
       {/* Welcome Banner */}
@@ -191,27 +145,27 @@ export default function DashboardOverview() {
         <div className="relative z-10 max-w-2xl space-y-2">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
             <Sparkles className="h-3 w-3" />
-            Zero-Database Dynamic Form Engine
+            Bull Machine Automation Console
           </div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-            Generate and share forms dynamically in seconds.
+            Monitor Overdue Purchase Orders & Inventory
           </h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Create completely self-contained schemas where all configurations, validation structures, and endpoint webhooks are serialized natively within the URL. No database tables, no configuration migrations, no server provisioning.
+            Automate vendor feedback loops, trigger alerts for overdue delivery dates, and track real-time stock levels of active parts and materials.
           </p>
           <div className="pt-1.5 flex flex-wrap gap-2.5">
-            <Link href="/settings">
+            <Link href="/overdue">
               <Button size="sm" className="font-bold text-xs h-8 flex items-center gap-1.5 shadow-sm shadow-primary/20">
-                <Plus className="h-3.5 w-3.5" />
-                Build New Form
+                <FileClock className="h-3.5 w-3.5" />
+                Manage Overdue Orders
               </Button>
             </Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer">
+            <Link href="/stocks">
               <Button size="sm" variant="outline" className="font-bold text-xs h-8 flex items-center gap-1.5 bg-background">
-                <BookOpen className="h-3.5 w-3.5" />
-                API Reference
+                <Boxes className="h-3.5 w-3.5" />
+                View Inventory Levels
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
         {/* Abstract background blobs */}
@@ -231,7 +185,11 @@ export default function DashboardOverview() {
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{m.title}</p>
                   <h3 className="text-lg font-bold text-foreground">{m.value}</h3>
                   <span className={`inline-flex items-center gap-1 text-[9px] font-bold ${
-                    m.changeType === 'positive' ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'
+                    m.changeType === 'positive' 
+                      ? 'text-emerald-600 dark:text-emerald-400' 
+                      : m.changeType === 'negative' 
+                        ? 'text-destructive' 
+                        : 'text-muted-foreground'
                   }`}>
                     {m.changeType === 'positive' && <TrendingUp className="h-2.5 w-2.5" />}
                     {m.change}
@@ -249,7 +207,7 @@ export default function DashboardOverview() {
       {/* Main Grid: Graph and Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
-        {/* Left Side: Mock Traffic Graph */}
+        {/* Left Side: Analytics Graph */}
         <Card className="lg:col-span-8 border border-border/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-1.5 border-b border-border/40">
             <div>
@@ -316,6 +274,7 @@ export default function DashboardOverview() {
             </div>
           </CardContent>
         </Card>
+
         {/* Right Side: Quick Guides / Integrations */}
         <Card className="lg:col-span-4 border border-border/80 shadow-sm flex flex-col justify-between">
           <CardHeader className="pb-2 border-b border-border/40">
@@ -349,9 +308,9 @@ export default function DashboardOverview() {
               </div>
             </div>
 
-            <Link href="/settings" className="w-full">
+            <Link href="/overdue" className="w-full">
               <Button variant="outline" className="w-full justify-between font-bold text-[10px] h-8 bg-background hover:bg-muted group">
-                Open Form Builder
+                Manage Overdue Orders
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
@@ -359,16 +318,16 @@ export default function DashboardOverview() {
         </Card>
       </div>
 
-      {/* Recent Generated Forms Table */}
+      {/* Recent Overdue Orders Table */}
       <Card className="border border-border/80 shadow-sm overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/40">
           <div>
-            <CardTitle className="text-xs font-bold">Standard Presets & Templates</CardTitle>
-            <CardDescription className="text-[10px]">Quickly run or duplicate validated form configuration schemas</CardDescription>
+            <CardTitle className="text-xs font-bold">Recent Overdue Purchase Orders</CardTitle>
+            <CardDescription className="text-[10px]">Monitor live response links and alert triggers for recent overdue PO items</CardDescription>
           </div>
-          <Link href="/settings">
+          <Link href="/overdue">
             <Button size="sm" variant="ghost" className="text-[11px] font-bold text-primary flex items-center gap-1 h-7">
-              Customize
+              View All
               <ArrowUpRight className="h-3 w-3" />
             </Button>
           </Link>
@@ -378,61 +337,92 @@ export default function DashboardOverview() {
             <table className="w-full text-left text-[11px] border-collapse">
               <thead>
                 <tr className="bg-muted/40 border-b border-border/40 text-muted-foreground font-semibold">
-                  <th className="py-2.5 px-4">Form Name</th>
-                  <th className="py-2.5 px-3">Fields count</th>
-                  <th className="py-2.5 px-3">Webhook target</th>
-                  <th className="py-2.5 px-3">Total Mock Submissions</th>
+                  <th className="py-2.5 px-4">PO Number</th>
+                  <th className="py-2.5 px-3">Material & Description</th>
+                  <th className="py-2.5 px-3">Vendor Name</th>
+                  <th className="py-2.5 px-3">Due Date</th>
                   <th className="py-2.5 px-3">Status</th>
                   <th className="py-2.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40">
-                {recentForms.map((form) => {
-                  const url = formLinks[form.key] || '#';
-                  const isCopied = copiedIndex === form.key;
-                  return (
-                    <tr key={form.key} className="hover:bg-muted/20 transition-colors">
-                      <td className="py-2.5 px-4 font-bold text-foreground flex items-center gap-1.5">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                        {form.name}
-                      </td>
-                      <td className="py-2.5 px-3 text-muted-foreground font-medium">{form.fieldsCount} Input Fields</td>
-                      <td className="py-2.5 px-3 font-mono text-[9px] text-muted-foreground truncate max-w-[200px]" title={form.webhook}>
-                        {form.webhook}
-                      </td>
-                      <td className="py-2.5 px-3 font-semibold text-foreground">{form.submissions}</td>
-                      <td className="py-2.5 px-3">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          {form.status}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-4 text-right space-x-1 whitespace-nowrap">
-                        {/* Copy button */}
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                          title="Copy Share Link"
-                          onClick={() => handleCopyLink(form.key, url)}
-                        >
-                          {isCopied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                        </Button>
-                        
-                        {/* Open live form */}
-                        <a href={url} target="_blank" rel="noreferrer">
+                {ordersLoading ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      Loading live PO data...
+                    </td>
+                  </tr>
+                ) : recentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
+                      No overdue orders found. Reset database or import records to view.
+                    </td>
+                  </tr>
+                ) : (
+                  recentOrders.map((order) => {
+                    const isCopied = copiedId === order.id;
+                    const orderDate = order.order_due_date 
+                      ? new Date(order.order_due_date).toLocaleDateString('en-GB') 
+                      : 'N/A';
+                    
+                    return (
+                      <tr key={order.id} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-2.5 px-4 font-bold text-foreground">
+                          {order.po_no} (Item: {order.po_item_no})
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span className="font-bold text-foreground block">{order.material}</span>
+                          <span className="text-[10px] text-muted-foreground truncate max-w-[240px] block" title={order.mat_desc || ''}>
+                            {order.mat_desc}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-muted-foreground font-medium">
+                          {order.vendor_name}
+                        </td>
+                        <td className="py-2.5 px-3 font-semibold text-foreground">
+                          {orderDate}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          {order.form_id ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                              Form Ready
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-1.5 py-0.5 text-[9px] font-bold text-yellow-600 dark:text-yellow-400 border border-yellow-500/20">
+                              Pending Link
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-4 text-right space-x-1 whitespace-nowrap">
+                          {/* Copy button */}
                           <Button 
                             size="icon" 
                             variant="ghost" 
                             className="h-7 w-7 text-muted-foreground hover:text-foreground"
-                            title="Open Shareable Form"
+                            title="Copy Share Link"
+                            onClick={() => order.form_id && handleCopyLink(order.id, order.form_id)}
+                            disabled={!order.form_id}
                           >
-                            <ExternalLink className="h-3.5 w-3.5" />
+                            {isCopied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
                           </Button>
-                        </a>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          
+                          {/* Open live form */}
+                          <a href={order.form_id || '#'} target="_blank" rel="noreferrer" className={!order.form_id ? 'pointer-events-none' : ''}>
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              title="Open Shareable Form"
+                              disabled={!order.form_id}
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Button>
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

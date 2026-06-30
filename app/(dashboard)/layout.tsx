@@ -111,10 +111,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       `}>
         {/* Sidebar Header */}
         <div className="flex h-14 items-center justify-between border-b border-border/80 px-5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-md shadow-primary/20 animate-pulse">
-              <Hammer className="h-5 w-5" />
-            </div>
+          <Link href="/" className="flex items-center">
             <div className="flex flex-col">
               <span className="font-extrabold text-sm leading-none tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
                 Bull Machine
