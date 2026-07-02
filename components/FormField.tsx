@@ -160,7 +160,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
             const minStock = field.minStock;
             const hasStockInfo = currentStock !== undefined && minStock !== undefined;
             const daysOfStock = hasStockInfo && minStock > 0 ? (currentStock / minStock) : 999;
-            const allowedDays = hasStockInfo ? Math.max(0, Math.floor(daysOfStock) - 2) : 999;
+            const allowedDays = hasStockInfo ? Math.max(0, Math.floor(daysOfStock) - 3) : 999;
             const isLowStock = hasStockInfo && allowedDays === 0;
 
             return (
@@ -227,7 +227,7 @@ export const FormField: React.FC<FormFieldProps> = ({ field, register, control, 
                     {isLowStock ? (
                       <span>Low Stock Alert ({daysOfStock.toFixed(1)} days left) — Delivery date restricted to today only.</span>
                     ) : (
-                      <span>Stock Status: Healthy ({daysOfStock.toFixed(1)} days left) — Can select up to {allowedDays} days in future.</span>
+                      <span>Stock Status: Healthy ({daysOfStock.toFixed(1)} days left) — Can select up to {allowedDays + 1} days (including today).</span>
                     )}
                   </div>
                 )}
